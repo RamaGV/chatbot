@@ -19,41 +19,56 @@ const ChatView: React.FC<ChatViewProps> = ({
     const generatedResponsesRef = useRef(null);
 
 
+
+  // Desplazar hacia abajo cuando los mensajes cambian
     useEffect(() => {
         const timeout = setTimeout(() => {
-          if (chatContainerRef.current) {
-            if (generatedResponses.length > 0) {
-              // Desplazar hacia abajo cuando aparecen las respuestas generadas
-              chatContainerRef.current.scrollTo({
+            if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTo({
                 top: chatContainerRef.current.scrollHeight,
                 behavior: 'smooth',
-              });
-            } else if (
-              previousGeneratedResponsesLength.current > 0 &&
-              generatedResponses.length === 0
-            ) {
-              // Ajustar posición del scroll cuando desaparecen las respuestas generadas
-              chatContainerRef.current.scrollTo({
-                top:
-                  chatContainerRef.current.scrollTop -
-                  generatedResponsesHeightRef.current,
+            });
+            }
+        }, 200);
+
+        return () => clearTimeout(timeout);
+    }, [messages]);
+
+  // Manejar el desplazamiento cuando cambian las respuestas generadas
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            if (chatContainerRef.current) {
+            if (generatedResponses.length > 0) {
+                // Desplazar hacia abajo cuando aparecen las respuestas generadas
+                chatContainerRef.current.scrollTo({
+                top: chatContainerRef.current.scrollHeight,
                 behavior: 'smooth',
-              });
+                });
+            } else if (
+                previousGeneratedResponsesLength.current > 0 &&
+                generatedResponses.length === 0
+            ) {
+                // Ajustar posición del scroll cuando desaparecen las respuestas generadas
+                chatContainerRef.current.scrollTo({
+                top:
+                    chatContainerRef.current.scrollTop -
+                    generatedResponsesHeightRef.current,
+                behavior: 'smooth',
+                });
             }
             previousGeneratedResponsesLength.current = generatedResponses.length;
-          }
+            }
         }, 200);
-      
+
         return () => clearTimeout(timeout);
-      }, [generatedResponses, messages]);
-      
+    }, [generatedResponses]);
     
     useEffect(() => {
-        if (generatedResponsesRef.current && generatedResponses.length > 0) {
-            generatedResponsesHeightRef.current = generatedResponsesRef.current.offsetHeight;
-        }
+      if (generatedResponsesRef.current && generatedResponses.length > 0) {
+        generatedResponsesHeightRef.current = generatedResponsesRef.current.offsetHeight;
+      }
     }, [generatedResponses]);
-      
+
     return (
         <div className="flex-1 flex flex-col relative bg-gradient-to-r from-rose-100 via-rose-50 to-rose-50">
             {selectedContact ? (
@@ -110,17 +125,17 @@ const ChatView: React.FC<ChatViewProps> = ({
                             >
                             {generatedResponses.map((response, index) => (
                                 <motion.div
-                                key={index}
-                                initial={{ opacity: 0, y: -10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -10 }}
-                                transition={{ delay: index * 0.1 }}
-                                className={`bg-gradient-to-r from-blue-500 to-purple-600 text-white p-3 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer max-w-[70%] ${
-                                    selectedResponse === response ? 'border-2 border-blue-500' : ''
-                                }`}
-                                onClick={() => handleResponseSelection(response)}
+                                    key={index}
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    transition={{ delay: index * 0.1 }}
+                                    className={`bg-gradient-to-r from-blue-500 to-purple-600 text-white p-3 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer max-w-[70%] ${
+                                        selectedResponse === response ? 'border-2 border-blue-500' : ''
+                                    }`}
+                                    onClick={() => handleResponseSelection(response)}
                                 >
-                                <p>{response}</p>
+                                    <p>{response}</p>
                                 </motion.div>
                             ))}
                             </motion.div>
